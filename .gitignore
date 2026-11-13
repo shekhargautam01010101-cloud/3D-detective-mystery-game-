@@ -1,0 +1,14 @@
+# Build output and local persistent database
+/target/
+/data/
+*.mv.db
+*.trace.db
+
+# IDE/editor
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.DS_Store

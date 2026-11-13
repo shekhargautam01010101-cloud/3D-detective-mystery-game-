@@ -1,36 +1,48 @@
 # Blackwood Mystery 3D
 
-A complete, browser-based low-poly detective game made with plain HTML, CSS, JavaScript and Three.js **r160** from a pinned CDN URL. There is no build step or package installation.
+A Java 21 / Spring Boot detective game with a low-poly Three.js client. Spring owns authentication, case content, clue collection, dialogue, accusations, hints, scoring, and persistence; the browser is a rendering and input client. All dependencies are free.
 
-## Run with VS Code Live Server
+## Architecture
 
-1. Download or clone this repository and open its folder in VS Code.
-2. Install/enable the **Live Server** extension if needed.
-3. Right-click `index.html` and choose **Open with Live Server** (or click **Go Live**).
-4. The game loads Three.js from jsDelivr, so an internet connection is required. No local server-side code is used.
+- **Backend:** Spring Boot REST API in `com.blackwood.mystery` (controller, service, model, repository, dto, config, exception).
+- **Persistence:** Spring Data JPA with file-backed H2 at `./data/blackwood`; H2 Console is available at `/h2-console` for development.
+- **Authentication:** BCrypt password hashes and UUID bearer-like tokens in `X-Auth-Token`; no full Spring Security configuration is used.
+- **Frontend:** static resources in `src/main/resources/static`; Three.js r160 from a pinned jsDelivr URL. Game text and rules come from API responses, not client-side case data.
 
-## How to play
+## Run
 
-Start the case briefing with **Enter the mansion**, then click Inspector Rao’s response to begin. Explore the connected rooms, look for glowing evidence, and speak with each suspect. Collecting evidence updates the Evidence Board. You need at least four clues to open an accusation; select the suspect and exactly two clues to present.
+Requires Java 21. From the repository root on Windows:
 
-### Controls
+```powershell
+.\mvnw.cmd spring-boot:run
+```
 
-- **W / A / S / D** — walk
-- **Shift** — run
-- **Mouse or touchpad drag** — rotate the third-person camera
-- **Arrow keys** — rotate and tilt the camera
-- **E** — collect nearby evidence or speak to a nearby suspect
-- **Tab** — open/close the Evidence Board
-- **Esc** — close the open panel
+Then open <http://localhost:8080>. Maven wrapper files must be present in the checkout. If they are absent, run `mvn spring-boot:run` with Maven installed. On other platforms use `./mvnw spring-boot:run`.
 
-The canvas disables browser touch scrolling so pointer dragging also works on touchscreen laptops. Movement is blocked by mansion walls. On a laptop with integrated graphics, the game uses low-poly models, simple lighting, no real-time shadows, and a maximum pixel ratio of 1.5.
+Run tests with `./mvnw test` (Windows: `./mvnw.cmd test`). The first build may need internet access to download Maven dependencies and Three.js needs internet access in the browser. H2 data persists in the ignored `data/` directory.
 
-Inspector Rao supplies a hint after two minutes without an action. Wrong accusations consume one of three attempts; a correct accusation needs Karan and at least two of clues 2, 3 and 4. A successful case displays elapsed time, clues found and a rank.
+## API
 
-## Rooms
+Authentication endpoints accept JSON `{ "username": "...", "password": "..." }`:
 
-Main Hall, Study, Library, Garden, Kitchen, Guest Room and Security Room are arranged as connected walkable spaces with door openings. The HUD displays the room you are currently in.
+- `POST /api/auth/register` — create account and return token.
+- `POST /api/auth/login` — authenticate and return token.
+- `GET /api/case/intro` — briefing, public suspect names/roles, and room names.
+- `POST /api/game/start` — start an authenticated session.
+- `POST /api/game/{sessionId}/collect` — body `{ "clueId": 1 }`.
+- `GET /api/game/{sessionId}/evidence` — collected evidence, timer and chances.
+- `POST /api/game/{sessionId}/talk` — `{ "suspectId": "rahul", "questionId": "1" }`.
+- `POST /api/game/{sessionId}/confront` — `{ "suspectId": "karan", "clueId": 2 }`.
+- `POST /api/game/{sessionId}/accuse` — `{ "suspectId": "karan", "proofClueIds": [2,3] }`.
+- `GET /api/game/{sessionId}/hint` — rate-limited by progress time.
+- `GET /api/leaderboard` — top ten scores.
+
+Authenticated requests include `X-Auth-Token`. Errors use JSON with `timestamp`, `error`, and `message`.
+
+## Controls
+
+WASD moves, Shift runs, mouse/touch drag and arrow keys control the camera, E interacts, Tab opens the evidence board, and Esc closes a panel. Use the hint button after the inactivity cooldown. Low-resolution shadows and a 1.5 maximum pixel ratio target integrated graphics.
 
 ## Spoiler — solution
 
-> **Karan, Arjun’s nephew, is the murderer.** Arjun’s new will removed Karan from the inheritance (clue 2), muddy prints show the murderer came from the garden (clue 3), and a cufflink marked **K** was found under the study desk (clue 4). Any two of these three are valid proof for the final accusation. The security log clears Rahul; the household and phone records clear Aman and Priya.
+**Karan, Arjun's nephew, is the murderer.** The will page (clue 2) gives him a motive, garden prints (clue 3) connect his route to the study, and the K cufflink (clue 4) ties him to the scene. The gate footage clears Rahul; guest and call records clear Aman and Priya. Accuse Karan with any two of clues 2, 3, and 4.
