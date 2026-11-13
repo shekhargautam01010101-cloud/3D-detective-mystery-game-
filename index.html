@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#101114">
+  <title>Blackwood Mystery 3D</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script defer src="game.js"></script>
+</head>
+<body>
+  <main id="game-shell">
+    <canvas id="game-canvas" aria-label="Blackwood Mansion 3D game"></canvas>
+    <div id="vignette" aria-hidden="true"></div>
+    <header id="hud" class="hud hidden">
+      <div class="brand"><span class="brand-mark">B</span><div><strong>BLACKWOOD</strong><small> MYSTERY 3D</small></div></div>
+      <div class="hud-center"><span class="eyebrow">LOCATION</span><strong id="room-name">Main Hall</strong></div>
+      <div class="hud-right"><span class="clue-count"><b id="clue-count">0</b> / 6 <small>CLUES</small></span><button id="board-button" class="icon-button" title="Evidence board (Tab)">▤ <span>Evidence</span></button></div>
+    </header>
+    <div id="objective" class="objective hidden">Speak with Inspector Rao and investigate the mansion.</div>
+    <div id="interaction-prompt" class="interaction-prompt hidden"><kbd>E</kbd><span>Interact</span></div>
+    <div id="hint-toast" class="hint-toast hidden"></div>
+    <footer id="controls" class="controls hidden"><span><kbd>WASD</kbd> Move</span><span><kbd>SHIFT</kbd> Run</span><span><kbd>DRAG</kbd> Look around</span><span><kbd>← ↑ ↓ →</kbd> Camera</span><span><kbd>E</kbd> Interact</span><span><kbd>TAB</kbd> Evidence</span></footer>
+
+    <section id="start-screen" class="screen visible">
+      <div class="title-card"><div class="case-label">A BLACKWOOD MANSION CASE</div><h1>THE <em>BLACKWOOD</em><br>MYSTERY</h1><p class="title-sub">A death at 9:40 PM. Four stories. One truth.</p><div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div><button id="start-button" class="primary-button">Enter the mansion <span>→</span></button><p class="microcopy">Best played with a keyboard and mouse or laptop touchpad</p></div>
+      <div class="start-meta"><span>INSPECTOR RAO · CASE 09:40</span><span>BLACKWOOD ESTATE · 1928</span></div>
+    </section>
+
+    <section id="dialogue-panel" class="panel hidden" aria-live="polite">
+      <button class="panel-close" data-close aria-label="Close">×</button><div class="panel-kicker" id="dialogue-kicker">INSPECTOR RAO</div><h2 id="dialogue-title">The case</h2><p id="dialogue-text"></p><div id="dialogue-options" class="dialogue-options"></div>
+    </section>
+    <section id="evidence-panel" class="panel evidence-panel hidden">
+      <button class="panel-close" data-close aria-label="Close">×</button><div class="panel-kicker">CASE FILE · BLACKWOOD MANSION</div><h2>Evidence board</h2><p class="panel-intro">Every detail matters. Review what you have found before making an accusation.</p><div id="evidence-grid" class="evidence-grid"></div><div class="board-actions"><span id="attempts-label">Attempts remaining: 3</span><button id="accuse-button" class="primary-button" disabled>Accuse a suspect <span>→</span></button></div><div id="accusation-form" class="accusation-form hidden"><label>Suspect<select id="suspect-select"><option value="">Choose a suspect…</option><option>Rahul</option><option>Aman</option><option>Priya</option><option>Karan</option></select></label><div><strong>Select exactly two clues as proof</strong><div id="proof-options" class="proof-options"></div></div><button id="submit-accusation" class="primary-button">Present your case <span>→</span></button><p id="accusation-feedback" class="feedback"></p></div></section>
+    <section id="clue-popup" class="panel clue-popup hidden"><button class="panel-close" data-close aria-label="Close">×</button><div class="panel-kicker">EVIDENCE COLLECTED</div><h2 id="clue-popup-title"></h2><p id="clue-popup-desc"></p><div class="points-to" id="clue-popup-points"></div><button class="text-button" data-close>Continue investigating →</button></section>
+    <section id="ending-screen" class="screen hidden"><div class="ending-card"><div id="ending-icon" class="ending-icon">✦</div><div class="case-label" id="ending-kicker">CASE SOLVED</div><h2 id="ending-title">Justice for Arjun.</h2><p id="ending-copy"></p><div id="score-breakdown" class="score-breakdown"></div><button id="retry-button" class="primary-button">Play again <span>↻</span></button></div></section>
+    <div id="fade" class="fade"></div>
+  </main>
+</body>
+</html>
